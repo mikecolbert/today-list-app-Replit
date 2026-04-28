@@ -4,14 +4,14 @@ Today list application vibe coded in Replit
 
 These are intentionally excluded:
 
-❌ User accounts / login
-❌ Cloud sync (local storage is fine)
-❌ Editing past entries
-❌ Deleting entries
-❌ User defined categories
-❌ Notifications/reminders
-❌ AI features (summaries, etc.)
-❌ Rich text formatting
+❌ User accounts / login  
+❌ Cloud sync (local storage is fine)  
+❌ Editing past entries  
+❌ Deleting entries  
+❌ User defined categories  
+❌ Notifications/reminders  
+❌ AI features (summaries, etc.)  
+❌ Rich text formatting  
 ❌ Attachments (photos, files)
 
 ## One master prompt
