@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Today List"
+version = "1.0.0"
+id = "artifacts/today-list"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25992
+
+[services.development]
+run = "pnpm --filter @workspace/today-list run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/today-list", "run", "build" ]
+publicDir = "artifacts/today-list/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25992"
+BASE_PATH = "/"

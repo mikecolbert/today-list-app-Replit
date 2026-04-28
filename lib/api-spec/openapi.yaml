@@ -1,0 +1,387 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: entries
+    description: Diary entry operations
+  - name: categories
+    description: Category operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /entries:
+    get:
+      operationId: listEntries
+      tags: [entries]
+      summary: List all entries
+      description: Returns entries ordered by created_at desc, with optional search and category filter
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Full-text search across entry text
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Filter entries by category ID
+      responses:
+        "200":
+          description: List of entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListEntriesResponse"
+    post:
+      operationId: createEntry
+      tags: [entries]
+      summary: Create a new entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEntryBody"
+      responses:
+        "201":
+          description: Entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entry"
+        "400":
+          description: Validation error
+
+  /entries/stats:
+    get:
+      operationId: getEntryStats
+      tags: [entries]
+      summary: Get diary stats
+      description: Returns counts by mood, by category, recent streak, and total count
+      responses:
+        "200":
+          description: Stats overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EntryStats"
+
+  /entries/{id}:
+    get:
+      operationId: getEntry
+      tags: [entries]
+      summary: Get a single entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Entry found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entry"
+        "404":
+          description: Entry not found
+    patch:
+      operationId: updateEntry
+      tags: [entries]
+      summary: Update an entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEntryBody"
+      responses:
+        "200":
+          description: Entry updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entry"
+        "404":
+          description: Entry not found
+    delete:
+      operationId: deleteEntry
+      tags: [entries]
+      summary: Delete an entry
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Entry deleted
+        "404":
+          description: Entry not found
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List all categories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListCategoriesResponse"
+    post:
+      operationId: createCategory
+      tags: [categories]
+      summary: Create a new category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategoryBody"
+      responses:
+        "201":
+          description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "400":
+          description: Validation error
+
+  /categories/{id}:
+    patch:
+      operationId: updateCategory
+      tags: [categories]
+      summary: Update a category name or color
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCategoryBody"
+      responses:
+        "200":
+          description: Category updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Category"
+        "404":
+          description: Category not found
+    delete:
+      operationId: deleteCategory
+      tags: [categories]
+      summary: Delete a category
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Category deleted
+        "404":
+          description: Category not found
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Mood:
+      type: string
+      enum: [great, good, okay, bad, awful]
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        color:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - color
+        - createdAt
+
+    ListCategoriesResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/Category"
+
+    CreateCategoryBody:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+      required:
+        - name
+        - color
+
+    UpdateCategoryBody:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
+
+    Entry:
+      type: object
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        mood:
+          $ref: "#/components/schemas/Mood"
+        categoryIds:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - text
+        - mood
+        - categoryIds
+        - createdAt
+        - updatedAt
+
+    ListEntriesResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/Entry"
+
+    CreateEntryBody:
+      type: object
+      properties:
+        text:
+          type: string
+        mood:
+          $ref: "#/components/schemas/Mood"
+        categoryIds:
+          type: array
+          items:
+            type: string
+      required:
+        - text
+        - mood
+        - categoryIds
+
+    UpdateEntryBody:
+      type: object
+      properties:
+        text:
+          type: string
+        mood:
+          $ref: "#/components/schemas/Mood"
+        categoryIds:
+          type: array
+          items:
+            type: string
+
+    MoodCount:
+      type: object
+      properties:
+        mood:
+          $ref: "#/components/schemas/Mood"
+        count:
+          type: integer
+      required:
+        - mood
+        - count
+
+    CategoryCount:
+      type: object
+      properties:
+        categoryId:
+          type: string
+        categoryName:
+          type: string
+        count:
+          type: integer
+      required:
+        - categoryId
+        - categoryName
+        - count
+
+    EntryStats:
+      type: object
+      properties:
+        totalEntries:
+          type: integer
+        currentStreak:
+          type: integer
+        moodCounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/MoodCount"
+        categoryCounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryCount"
+      required:
+        - totalEntries
+        - currentStreak
+        - moodCounts
+        - categoryCounts
