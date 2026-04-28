@@ -56,7 +56,7 @@ jobs:
           mkdir -p deploy/artifacts/api-server
           mkdir -p deploy/artifacts/today-list
           cp -r artifacts/api-server/dist deploy/artifacts/api-server/dist
-          cp -r artifacts/reading-buddy/dist deploy/artifacts/today-list/dist
+          cp -r artifacts/today-list/dist deploy/artifacts/today-list/dist
 
       # Upload the deploy/ folder so the deploy job can access it.
       - name: Upload artifact for deployment job
