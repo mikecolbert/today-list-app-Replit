@@ -37,7 +37,7 @@ jobs:
 
       # Install all third-party libraries across the monorepo.
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
 
       # Build the frontend (Vite) and backend (esbuild).
       # NODE_ENV=production tells build tools to optimize output.
