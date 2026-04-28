@@ -48,7 +48,7 @@ if (process.env.SERVE_STATIC === "true") {
 
   // SPA catch-all: any request that doesn't match /api or a static file
   // gets index.html so the React router can handle it client-side.
-  app.get("*", (_req, res) => {
+  app.get("/{*path}", (_req, res) => {
     res.sendFile(path.join(staticDir, "index.html"));
   });
 }
